@@ -11,6 +11,7 @@ export const useUserStore = defineStore("user", {
     isLoading: (state) => state.status === "Searching...",
   },
 
+  // Actions can be asynchronous and can modify the state
   actions: {
     async refreshUser() {
       this.user = "Loading...";
