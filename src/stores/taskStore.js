@@ -2,8 +2,10 @@ import { defineStore } from "pinia";
 
 export const useTaskStore = defineStore("task", {
   state: () => ({
-    tasks: [], // [TASK 14] Stores all sub-tasks
+    // [TASK 14] Load tasks from localStorage or default to empty array
+    tasks: JSON.parse(localStorage.getItem("saasflow_tasks")) || [],
   }),
+
   getters: {
     // [TASK 14] Filter tasks for the specific project
     getTasksByProject: (state) => (projectId) => {
@@ -12,6 +14,7 @@ export const useTaskStore = defineStore("task", {
         (t) => String(t.projectId) === String(projectId),
       );
     },
+
     // [TASK 15] Logic to calculate the % of completion
     getProjectProgress: (state) => (projectId) => {
       const projectTasks = state.tasks.filter(
@@ -23,7 +26,15 @@ export const useTaskStore = defineStore("task", {
       return Math.round((completed / projectTasks.length) * 100);
     },
   },
+
   actions: {
+    /**
+     * Internal helper to persist the current tasks state to browser storage.
+     */
+    saveToLocalStorage() {
+      localStorage.setItem("saasflow_tasks", JSON.stringify(this.tasks));
+    },
+
     // [TASK 14] Create new sub-task
     addTask(projectId, taskName) {
       this.tasks.push({
@@ -32,20 +43,41 @@ export const useTaskStore = defineStore("task", {
         name: taskName,
         completed: false,
       });
+      this.saveToLocalStorage();
     },
+
     // [TASK 14] Update status (Checkbox)
     toggleTask(taskId) {
       const task = this.tasks.find((t) => t.id === taskId);
-      if (task) task.completed = !task.completed;
+      if (task) {
+        task.completed = !task.completed;
+        this.saveToLocalStorage();
+      }
     },
+
     // [TASK 14] Update name (Edit)
     updateTaskName(taskId, newName) {
       const task = this.tasks.find((t) => t.id === taskId);
-      if (task) task.name = newName;
+      if (task) {
+        task.name = newName;
+        this.saveToLocalStorage();
+      }
     },
+
     // [TASK 14] Delete task
     deleteTask(taskId) {
       this.tasks = this.tasks.filter((t) => t.id !== taskId);
+      this.saveToLocalStorage();
+    },
+
+    /**
+     * Utility to clear all tasks for a deleted project (optional but recommended)
+     */
+    deleteTasksByProject(projectId) {
+      this.tasks = this.tasks.filter(
+        (t) => String(t.projectId) !== String(projectId),
+      );
+      this.saveToLocalStorage();
     },
   },
 });

@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Projects from "../views/Projects.vue"; // Using the file we just completed
+import ProjectList from "../views/ProjectList.vue"; // Updated import name
 
 Vue.use(VueRouter);
 
@@ -11,16 +11,14 @@ const routes = [
   },
   {
     path: "/projects",
-    name: "Projects",
-    component: Projects,
+    name: "ProjectList",
+    component: ProjectList,
   },
-  // Task 12: Project Detail Route
   {
-    path: "/project/:id",
+    path: "/project/:id/detail", // Exactly as per your Mini Project spec
     name: "project-detail",
-    // Lazy loading the detail view to keep the initial bundle small
     component: () => import("../views/ProjectDetail.vue"),
-    props: true, // This allows the :id to be passed as a prop directly to the component
+    props: true,
   },
 ];
 

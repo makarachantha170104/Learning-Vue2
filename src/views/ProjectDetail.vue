@@ -24,24 +24,55 @@
           </svg>
           <span class="hidden sm:inline text-sm">Back to Board</span>
         </button>
-
         <span
           class="text-[9px] sm:text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]"
           >Project Detail</span
         >
-
         <div class="w-8 sm:w-10"></div>
       </div>
     </div>
 
     <div
-      class="max-w-[800px] mx-auto px-4 sm:px-8 mt-6 sm:mt-10"
-      v-if="project"
+      v-if="projectStore.loading"
+      class="flex flex-col items-center justify-center pt-32"
+    >
+      <div
+        class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"
+      ></div>
+      <p class="text-gray-400 font-black text-[10px] uppercase tracking-widest">
+        Syncing with Store...
+      </p>
+    </div>
+
+    <div
+      v-else-if="projectStore.error || !project"
+      class="max-w-[500px] mx-auto px-8 mt-20 text-center"
+    >
+      <div class="bg-white p-10 rounded-3xl border border-gray-100 shadow-sm">
+        <div class="text-6xl mb-6">🔍</div>
+        <h2 class="text-2xl font-black text-gray-900">Project Not Found</h2>
+        <p class="text-gray-500 mt-2 mb-8 text-sm">
+          The project you are looking for might have been deleted or moved.
+        </p>
+        <button
+          @click="$router.push('/')"
+          class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <div
+      v-else
+      class="max-w-[800px] mx-auto px-4 sm:px-8 mt-6 sm:mt-10 animate-in fade-in slide-in-from-bottom-4 duration-700"
     >
       <div
         class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 mb-6"
       >
-        <div class="flex justify-between items-end mb-4">
+        <div
+          class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6"
+        >
           <div>
             <h2
               class="text-2xl sm:text-3xl font-black text-gray-900 leading-tight"
@@ -60,11 +91,9 @@
             >
           </div>
         </div>
-        <div
-          class="w-full h-2.5 sm:h-3 bg-gray-100 rounded-full overflow-hidden"
-        >
+        <div class="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
           <div
-            class="h-full bg-blue-600 transition-all duration-700 ease-in-out"
+            class="h-full bg-blue-600 transition-all duration-1000 ease-out"
             :style="{ width: progress + '%' }"
           ></div>
         </div>
@@ -84,9 +113,7 @@
       <div
         class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100"
       >
-        <h3
-          class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"
-        >
+        <h3 class="text-lg font-bold text-gray-900 mb-6">
           Sub-tasks Checklist
         </h3>
 
@@ -100,7 +127,7 @@
           />
           <button
             @click="handleAddTask"
-            class="bg-blue-600 text-white px-6 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 w-full sm:w-auto"
+            class="bg-blue-600 text-white px-8 py-3.5 rounded-xl font-bold hover:bg-blue-700 transition-all w-full sm:w-auto shadow-lg shadow-blue-100"
           >
             Add Task
           </button>
@@ -115,7 +142,7 @@
             <div class="flex items-center gap-4 flex-1">
               <div
                 @click="toggleAndSync(task.id)"
-                class="min-w-[24px] min-h-[24px] w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all"
+                class="min-w-[24px] w-6 h-6 rounded-lg border-2 flex items-center justify-center cursor-pointer transition-all"
                 :class="
                   task.completed
                     ? 'bg-green-500 border-green-500'
@@ -154,13 +181,12 @@
                     ? 'text-gray-300 line-through'
                     : 'text-gray-700'
                 "
+                >{{ task.name }}</span
               >
-                {{ task.name }}
-              </span>
             </div>
 
             <div
-              class="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity ml-2"
+              class="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
             >
               <button
                 @click="startEdit(task)"
@@ -209,8 +235,7 @@
 </template>
 
 <script>
-// [TASK 16]: Import the reusable component
-import StatusBadge from "@/components/StatusBadge.vue";
+import ProjectStatusBadge from "@/components/ProjectStatusBadge.vue";
 import { mapStores } from "pinia";
 import { useProjectStore } from "@/stores/projectStore";
 import { useTaskStore } from "@/stores/taskStore";
@@ -218,9 +243,7 @@ import { useTaskStore } from "@/stores/taskStore";
 export default {
   name: "ProjectDetail",
   props: ["id"],
-  components: {
-    StatusBadge, // [TASK 16]: Registering the component
-  },
+  components: { ProjectStatusBadge },
   data() {
     return {
       newTaskName: "",
@@ -230,70 +253,124 @@ export default {
   },
   computed: {
     ...mapStores(useProjectStore, useTaskStore),
-
     project() {
-      if (!this.projectStore) return null;
       return this.projectStore.projects.find(
         (p) => String(p.id) === String(this.id),
       );
     },
-
     subTasks() {
-      if (!this.taskStore) return [];
       return this.taskStore.getTasksByProject(this.id);
     },
-
     progress() {
-      if (
-        this.taskStore &&
+      return this.taskStore &&
         typeof this.taskStore.getProjectProgress === "function"
-      ) {
-        return this.taskStore.getProjectProgress(this.id);
-      }
-      return 0;
+        ? this.taskStore.getProjectProgress(this.id)
+        : 0;
     },
   },
   methods: {
+    /**
+     * Syncs the task-based progress and status back to the main Project Store.
+     * This is what updates the progress bar on the Kanban card.
+     */
     syncProjectStatus() {
-      const p = this.progress;
+      const currentProgress = this.progress; // Calculated from the taskStore getter
+
+      // Determine the status based on percentage
       let newStatus = "Todo";
-      if (p === 100) newStatus = "Completed";
-      else if (p > 0) newStatus = "In Progress";
-      this.projectStore.updateProject(this.id, { status: newStatus });
-    },
+      if (currentProgress === 100) {
+        newStatus = "Completed";
+      } else if (currentProgress > 0) {
+        newStatus = "In Progress";
+      }
 
-    handleAddTask() {
-      if (!this.newTaskName.trim() || !this.taskStore) return;
-      this.taskStore.addTask(this.id, this.newTaskName);
-      this.newTaskName = "";
-      this.$nextTick(() => this.syncProjectStatus());
-    },
-
-    toggleAndSync(taskId) {
-      this.taskStore.toggleTask(taskId);
-      this.$nextTick(() => this.syncProjectStatus());
-    },
-
-    deleteAndSync(taskId) {
-      this.taskStore.deleteTask(taskId);
-      this.$nextTick(() => this.syncProjectStatus());
-    },
-
-    startEdit(task) {
-      this.editingTaskId = task.id;
-      this.editTaskBuffer = task.name;
-      this.$nextTick(() => {
-        if (this.$refs.editInput && this.$refs.editInput[0])
-          this.$refs.editInput[0].focus();
+      // Update the Project Store. We include the 'tasks' array so the
+      // Project Card can show the little progress dots.
+      this.projectStore.updateProject(this.id, {
+        status: newStatus,
+        progress: currentProgress,
+        tasks: this.subTasks,
       });
     },
 
-    saveEdit(taskId) {
-      if (this.editTaskBuffer.trim())
-        this.taskStore.updateTaskName(taskId, this.editTaskBuffer);
-      this.editingTaskId = null;
-      this.$nextTick(() => this.syncProjectStatus());
+    /**
+     * Adds a new sub-task and triggers a sync.
+     */
+    async handleAddTask() {
+      const name = this.newTaskName.trim();
+      if (!name) return;
+
+      try {
+        await this.taskStore.addTask(this.id, name);
+        this.newTaskName = "";
+
+        // Wait for DOM/Store update then sync
+        this.$nextTick(() => {
+          this.syncProjectStatus();
+        });
+      } catch (error) {
+        console.error("Failed to add task:", error);
+      }
     },
+
+    /**
+     * Toggles a task's completion status and updates the project percentage.
+     */
+    async toggleAndSync(taskId) {
+      try {
+        await this.taskStore.toggleTask(taskId);
+        this.syncProjectStatus();
+      } catch (error) {
+        console.error("Failed to toggle task:", error);
+      }
+    },
+
+    /**
+     * Deletes a task and recalculates the project percentage.
+     */
+    async deleteAndSync(taskId) {
+      if (confirm("Are you sure you want to delete this sub-task?")) {
+        try {
+          await this.taskStore.deleteTask(taskId);
+          this.syncProjectStatus();
+        } catch (error) {
+          console.error("Failed to delete task:", error);
+        }
+      }
+    },
+
+    /**
+     * Opens the inline editor for a task name.
+     */
+    startEdit(task) {
+      this.editingTaskId = task.id;
+      this.editTaskBuffer = task.name;
+      // Focus the input field once it appears in the DOM
+      this.$nextTick(() => {
+        const input = this.$refs.editInput;
+        if (input && input[0]) input[0].focus();
+      });
+    },
+
+    /**
+     * Saves the edited task name and triggers a sync.
+     */
+    async saveEdit(taskId) {
+      const newName = this.editTaskBuffer.trim();
+      if (newName && this.editingTaskId) {
+        try {
+          await this.taskStore.updateTaskName(taskId, newName);
+          this.syncProjectStatus();
+        } catch (error) {
+          console.error("Failed to update task name:", error);
+        }
+      }
+      this.editingTaskId = null;
+    },
+  },
+  async created() {
+    // [TASK 18]: Load data on component creation
+    await this.projectStore.fetchProjectById(this.id);
   },
 };
 </script>
