@@ -1,13 +1,10 @@
 import Vue from "vue";
 import App from "./App.vue";
 import router from "./router";
-import "./assets/tailwind.css";
+import { createPinia, PiniaVuePlugin } from "pinia"; // Import the plugin
+import "./assets/tailwind.css"; // Import Tailwind CSS
 
-// Pinia
-import { createPinia } from "pinia";
-
-Vue.config.productionTip = false;
-
+Vue.use(PiniaVuePlugin); // You MUST add this line for Vue 2
 const pinia = createPinia();
 
 new Vue({
