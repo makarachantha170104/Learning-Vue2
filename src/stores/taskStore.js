@@ -1,18 +1,51 @@
 import { defineStore } from "pinia";
 
-export const useTaskStore = defineStore("tasks", {
+export const useTaskStore = defineStore("task", {
   state: () => ({
-    tasks: [
-      { id: 1, name: "Setup Project", status: "Todo" },
-      { id: 2, name: "Install Pinia", status: "In Progress" },
-      { id: 3, name: "Deploy App", status: "Completed" },
-    ],
+    tasks: [], // [TASK 14] Stores all sub-tasks
   }),
+  getters: {
+    // [TASK 14] Filter tasks for the specific project
+    getTasksByProject: (state) => (projectId) => {
+      if (!state.tasks) return [];
+      return state.tasks.filter(
+        (t) => String(t.projectId) === String(projectId),
+      );
+    },
+    // [TASK 15] Logic to calculate the % of completion
+    getProjectProgress: (state) => (projectId) => {
+      const projectTasks = state.tasks.filter(
+        (t) => String(t.projectId) === String(projectId),
+      );
+      if (projectTasks.length === 0) return 0;
+
+      const completed = projectTasks.filter((t) => t.completed).length;
+      return Math.round((completed / projectTasks.length) * 100);
+    },
+  },
   actions: {
-    updateTaskStatus(taskId, newStatus) {
+    // [TASK 14] Create new sub-task
+    addTask(projectId, taskName) {
+      this.tasks.push({
+        id: Date.now(),
+        projectId: String(projectId),
+        name: taskName,
+        completed: false,
+      });
+    },
+    // [TASK 14] Update status (Checkbox)
+    toggleTask(taskId) {
       const task = this.tasks.find((t) => t.id === taskId);
-      if (task) task.status = newStatus;
-      // Save to localStorage here if needed
+      if (task) task.completed = !task.completed;
+    },
+    // [TASK 14] Update name (Edit)
+    updateTaskName(taskId, newName) {
+      const task = this.tasks.find((t) => t.id === taskId);
+      if (task) task.name = newName;
+    },
+    // [TASK 14] Delete task
+    deleteTask(taskId) {
+      this.tasks = this.tasks.filter((t) => t.id !== taskId);
     },
   },
 });

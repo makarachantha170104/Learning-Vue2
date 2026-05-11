@@ -1,7 +1,7 @@
 <template>
   <span
-    class="px-3 py-1 text-xs font-medium rounded-full capitalize"
     :class="statusClasses"
+    class="px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border transition-all duration-300 whitespace-nowrap"
   >
     {{ status }}
   </span>
@@ -14,22 +14,18 @@ export default {
     status: {
       type: String,
       required: true,
+      default: "Todo",
     },
   },
   computed: {
     statusClasses() {
-      switch (this.status) {
-        case "Todo":
-          return "bg-gray-100 text-gray-700";
-        case "In Progress":
-          return "bg-blue-100 text-blue-700";
-        case "Blocked":
-          return "bg-red-100 text-red-700";
-        case "Completed":
-          return "bg-emerald-100 text-emerald-700";
-        default:
-          return "bg-gray-100 text-gray-700";
-      }
+      const maps = {
+        Todo: "bg-gray-50 text-gray-500 border-gray-100",
+        "In Progress": "bg-blue-50 text-blue-600 border-blue-100",
+        Completed: "bg-green-50 text-green-600 border-green-100",
+        Blocked: "bg-red-50 text-red-600 border-red-100",
+      };
+      return maps[this.status] || maps["Todo"];
     },
   },
 };
