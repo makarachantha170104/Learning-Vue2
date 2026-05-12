@@ -25,9 +25,9 @@
         <p
           class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
         >
-          Total Tasks
+          {{ stats.first.label }}
         </p>
-        <p class="text-2xl font-black text-gray-900">{{ stats.total }}</p>
+        <p class="text-2xl font-black text-gray-900">{{ stats.first.value }}</p>
       </div>
     </div>
 
@@ -56,9 +56,11 @@
         <p
           class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
         >
-          In Progress
+          {{ stats.second.label }}
         </p>
-        <p class="text-2xl font-black text-gray-900">{{ stats.inProgress }}</p>
+        <p class="text-2xl font-black text-gray-900">
+          {{ stats.second.value }}
+        </p>
       </div>
     </div>
 
@@ -87,9 +89,11 @@
         <p
           class="text-[10px] font-bold text-gray-400 uppercase tracking-widest"
         >
-          Finished
+          {{ stats.third.label }}
         </p>
-        <p class="text-2xl font-black text-green-600">{{ stats.completed }}</p>
+        <p class="text-2xl font-black text-green-600">
+          {{ stats.third.value }}
+        </p>
       </div>
     </div>
   </div>
@@ -99,15 +103,48 @@
 export default {
   name: "ProjectOverview",
   props: {
-    projects: { type: Array, required: true },
+    projects: { type: Array, default: () => [] },
+    project: { type: Object, default: null },
   },
   computed: {
+    useProject() {
+      return Boolean(this.project);
+    },
     stats() {
+      if (this.useProject) {
+        const taskCount = this.project.tasks?.length || 0;
+        const completedTasks =
+          this.project.tasks?.filter((t) => t.completed).length || 0;
+
+        return {
+          first: {
+            label: "Total Tasks",
+            value: taskCount,
+          },
+          second: {
+            label: "Status",
+            value: this.project.status || "Todo",
+          },
+          third: {
+            label: "Completed Tasks",
+            value: completedTasks,
+          },
+        };
+      }
+
       return {
-        total: this.projects.length,
-        inProgress: this.projects.filter((p) => p.status === "In Progress")
-          .length,
-        completed: this.projects.filter((p) => p.status === "Completed").length,
+        first: {
+          label: "Total Projects",
+          value: this.projects.length,
+        },
+        second: {
+          label: "In Progress",
+          value: this.projects.filter((p) => p.status === "In Progress").length,
+        },
+        third: {
+          label: "Finished",
+          value: this.projects.filter((p) => p.status === "Completed").length,
+        },
       };
     },
   },

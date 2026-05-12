@@ -1,6 +1,7 @@
 <template>
   <div
     class="relative bg-white p-5 rounded-[2.5rem] border border-gray-100 shadow-sm transition-all duration-300 group cursor-pointer active:scale-[0.98] overflow-hidden"
+    :data-project-id="project.id"
     @click="goToDetail"
   >
     <div

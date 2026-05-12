@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     updateFilter(e) {
-      this.projectStore.statusFilter = e.target.value;
+      this.projectStore.filterProjects(e.target.value);
     },
   },
 };

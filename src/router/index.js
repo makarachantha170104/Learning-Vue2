@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import ProjectList from "../views/ProjectList.vue"; // Updated import name
+import Project from "../views/Project.vue";
 
 Vue.use(VueRouter);
 
@@ -11,12 +11,12 @@ const routes = [
   },
   {
     path: "/projects",
-    name: "ProjectList",
-    component: ProjectList,
+    name: "Project",
+    component: Project,
   },
   {
     path: "/project/:id/detail", // Exactly as per your Mini Project spec
-    name: "project-detail",
+    name: "ProjectDetail",
     component: () => import("../views/ProjectDetail.vue"),
     props: true,
   },

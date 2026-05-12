@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     updateSearch(e) {
-      this.projectStore.searchQuery = e.target.value;
+      this.projectStore.searchProjects(e.target.value);
     },
   },
 };

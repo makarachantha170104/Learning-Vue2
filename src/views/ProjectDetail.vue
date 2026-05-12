@@ -5,7 +5,7 @@
         class="max-w-[800px] mx-auto px-4 sm:px-8 py-5 flex justify-between items-center"
       >
         <button
-          @click="$router.push('/')"
+          @click="$router.push('/projects')"
           class="text-gray-500 font-bold flex items-center gap-2 hover:text-blue-600 transition-all"
         >
           <svg
@@ -55,10 +55,10 @@
           The project you are looking for might have been deleted or moved.
         </p>
         <button
-          @click="$router.push('/')"
+          @click="$router.push('/projects')"
           class="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-100"
         >
-          Back to Dashboard
+          Back to Projects
         </button>
       </div>
     </div>
@@ -67,6 +67,10 @@
       v-else
       class="max-w-[800px] mx-auto px-4 sm:px-8 mt-6 sm:mt-10 animate-in fade-in slide-in-from-bottom-4 duration-700"
     >
+      <!-- state component form projectOverview -->
+      <ProjectOverview :project="project" />
+
+      <!-- project name and progress percentage -->
       <div
         class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 mb-6"
       >
@@ -99,6 +103,7 @@
         </div>
       </div>
 
+      <!-- project description-->
       <div
         class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100 mb-6"
       >
@@ -110,6 +115,7 @@
         </p>
       </div>
 
+      <!-- sub task checklist -->
       <div
         class="bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100"
       >
@@ -117,6 +123,7 @@
           Sub-tasks Checklist
         </h3>
 
+        <!-- Add new Task input -->
         <div class="flex flex-col sm:flex-row gap-3 mb-8">
           <input
             v-model="newTaskName"
@@ -185,6 +192,7 @@
               >
             </div>
 
+            <!-- Task list with edit/delete options -->
             <div
               class="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
             >
@@ -235,6 +243,7 @@
 </template>
 
 <script>
+import ProjectOverview from "@/components/ProjectOverview.vue";
 import ProjectStatusBadge from "@/components/ProjectStatusBadge.vue";
 import { mapStores } from "pinia";
 import { useProjectStore } from "@/stores/projectStore";
@@ -243,7 +252,7 @@ import { useTaskStore } from "@/stores/taskStore";
 export default {
   name: "ProjectDetail",
   props: ["id"],
-  components: { ProjectStatusBadge },
+  components: { ProjectOverview, ProjectStatusBadge },
   data() {
     return {
       newTaskName: "",

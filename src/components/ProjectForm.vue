@@ -2,10 +2,12 @@
   <transition name="fade">
     <div
       v-if="visible"
-      class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999]"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      style="z-index: 999"
     >
       <div
         class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        style="z-index: 1000"
       >
         <div class="px-8 py-6 border-b border-gray-100">
           <h2 class="text-2xl font-bold text-gray-800">
@@ -48,8 +50,22 @@
             >
               <option>Todo</option>
               <option>In Progress</option>
+              <option>Blocked</option>
               <option>Completed</option>
             </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2"
+              >Progress %</label
+            >
+            <input
+              v-model.number="formData.progress"
+              type="number"
+              min="0"
+              max="100"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-white outline-none"
+            />
           </div>
 
           <div class="flex justify-end gap-3 pt-4">
@@ -78,21 +94,46 @@ export default {
   props: ["visible", "project"],
   data() {
     return {
-      formData: { name: "", description: "", status: "Todo" },
+      formData: {
+        name: "",
+        description: "",
+        status: "Todo",
+        progress: 0,
+      },
     };
   },
   watch: {
     project: {
       immediate: true,
       handler(newVal) {
-        if (newVal) this.formData = { ...newVal };
-        else this.formData = { name: "", description: "", status: "Todo" };
+        if (newVal)
+          this.formData = {
+            name: newVal.name || "",
+            description: newVal.description || "",
+            status: newVal.status || "Todo",
+            progress: typeof newVal.progress === "number" ? newVal.progress : 0,
+          };
+        else
+          this.formData = {
+            name: "",
+            description: "",
+            status: "Todo",
+            progress: 0,
+          };
       },
     },
   },
   methods: {
     handleSubmit() {
-      this.$emit("save", this.formData);
+      const progress = Number(this.formData.progress) || 0;
+      const payload = {
+        ...this.formData,
+        progress:
+          this.formData.status === "Completed"
+            ? 100
+            : Math.min(100, Math.max(0, progress)),
+      };
+      this.$emit("save", payload);
     },
   },
 };

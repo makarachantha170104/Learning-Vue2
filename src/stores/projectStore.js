@@ -65,18 +65,34 @@ export const useProjectStore = defineStore("project", {
       return project;
     },
 
+    searchProjects(query) {
+      this.searchQuery = query ? String(query) : "";
+    },
+
+    filterProjects(status) {
+      this.statusFilter = status || "all";
+    },
+
     // REQUIREMENT: Create project with all required fields
     createProject(data) {
       const newProject = {
         id: Date.now().toString(),
         name: data.name,
         description: data.description,
-        status: "Todo", // Default status
-        progress: 0, // REQUIREMENT: Progress % field
-        tasks: [], // REQUIREMENT: Task reference
+        status: data.status || "Todo",
+        progress:
+          typeof data.progress === "number" && data.progress >= 0
+            ? Math.min(100, data.progress)
+            : 0,
+        tasks: data.tasks || [],
         createdAt: new Date().toISOString(),
       };
-      this.projects.push(newProject);
+
+      if (newProject.status === "Completed") {
+        newProject.progress = 100;
+      }
+
+      this.projects.unshift(newProject);
       this.save();
     },
 
@@ -84,8 +100,20 @@ export const useProjectStore = defineStore("project", {
     updateProject(id, updates) {
       const index = this.projects.findIndex((p) => String(p.id) === String(id));
       if (index !== -1) {
-        // We use spread to ensure we don't lose the 'tasks' array when updating just the name
-        this.projects.splice(index, 1, { ...this.projects[index], ...updates });
+        const existing = this.projects[index];
+        const updated = { ...existing, ...updates };
+
+        if (updated.status === "Completed") {
+          updated.progress = 100;
+        }
+        if (updated.status === "Todo" && updated.progress > 0) {
+          updated.progress = 0;
+        }
+        if (typeof updated.progress !== "number") {
+          updated.progress = existing.progress || 0;
+        }
+
+        this.projects.splice(index, 1, updated);
         this.save();
       }
     },
