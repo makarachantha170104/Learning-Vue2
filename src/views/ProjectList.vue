@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-zinc-100 pb-20">
     <!-- Navbar -->
     <nav
-      class="bg-white/80 backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 py-5 px-6"
+      class="bg-white backdrop-blur-xl border-b border-slate-200 sticky top-0 z-50 py-5 px-6"
     >
       <div
         class="max-w-[1600px] mx-auto flex items-center justify-between gap-6"
