@@ -15,6 +15,7 @@
           </h2>
         </div>
 
+        <!-- Project Form -->
         <form @submit.prevent="handleSubmit" class="p-8 space-y-5">
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2"
