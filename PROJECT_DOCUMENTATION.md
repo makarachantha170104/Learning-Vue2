@@ -25,7 +25,50 @@ vue2-learning-app/
 ```
 
 ---
+## 🧩 Mini Project Summary
 
+This app is built as a simple Space / Project Management system with the following structure and behavior:
+
+- Route: `/projects`
+- Features:
+  - List all projects / spaces
+  - Create project
+  - Update project
+  - Delete project
+  - Search project by name
+  - Filter project by status
+- Project fields:
+  - Project name
+  - Description
+  - Status:
+    - Todo
+    - In Progress
+    - Blocked
+    - Completed
+  - Progress %
+- Core components:
+  - `ProjectList`
+  - `ProjectCard`
+  - `ProjectForm`
+  - `ProjectSearch`
+  - `ProjectFilter`
+  - `ProjectOverview`
+  - `ProjectStatusBadge`
+- Pinia actions available:
+  - `createProject()`
+  - `updateProject()`
+  - `deleteProject()`
+  - `searchProjects()`
+  - `filterProjects()`
+
+### Project Detail Page
+
+- Route: `/project/:id/detail`
+- Shows project information including status, progress, and related tasks
+- Supports task creation, update, and deletion for each project
+- Task completion updates project progress and project status
+
+---
 ## 🚀 Entry Point & Initialization
 
 ### `public/index.html`
