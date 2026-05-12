@@ -18,6 +18,7 @@
     <div class="relative z-10 flex flex-col gap-4">
       <div class="flex items-center justify-between gap-2">
         <div class="flex items-center gap-3 overflow-hidden">
+          <!-- mask task as done -->
           <button
             @click.stop="toggleQuickDone"
             class="w-6 h-6 rounded-xl border-2 flex-shrink-0 flex items-center justify-center transition-all shadow-sm"
@@ -43,6 +44,7 @@
             </svg>
           </button>
 
+          <!-- display name -->
           <h3
             class="font-black text-gray-800 truncate group-hover:text-blue-600 transition-colors"
             :class="{
@@ -54,6 +56,7 @@
           </h3>
         </div>
 
+        <!-- edit and delete buttons -->
         <div
           class="flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0"
         >
@@ -99,6 +102,7 @@
         </div>
       </div>
 
+      <!-- progress bar -->
       <div class="bg-gray-50/50 p-4 rounded-[1.8rem] border border-gray-50">
         <div class="flex justify-between items-center mb-2">
           <span
